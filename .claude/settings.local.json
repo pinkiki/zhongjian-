@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p mock)",
+      "Bash(pnpm dev)",
+      "Bash(node --version)",
+      "Bash(source ~/.nvm/nvm.sh)",
+      "Bash(nvm use 22.20.0)",
+      "Bash(pnpm --version)",
+      "Bash(corepack enable)",
+      "Bash(corepack prepare pnpm@9.15.0 --activate)",
+      "Bash(cat package.json)",
+      "Bash(npx eslint --version)",
+      "Bash(npx eslint src/main.ts)",
+      "Bash(npx eslint src/App.vue)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx prettier --version)",
+      "Bash(npx prettier --check src/main.ts)",
+      "Bash(npx stylelint --version)",
+      "Bash(npx stylelint \"src/**/*.vue\")",
+      "Bash(pnpm run lint:check)",
+      "Bash(pnpm run type-check)",
+      "Bash(pnpm run lint)",
+      "Bash(pnpm run format:check)",
+      "Bash(pnpm run lint:style:check)",
+      "Bash(pnpm run lint:style)",
+      "Bash(timeout 15 pnpm dev)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
