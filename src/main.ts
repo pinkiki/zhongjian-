@@ -1,8 +1,12 @@
 import App from './App.vue'
+import pinia from "@/store";
+import router from "./router";
 import { createApp, type Directive } from "vue";
 import { getPlatformConfig } from "./config";
 import { useVxeTable } from "@/plugins/vxeTable";
 import { useElementPlus } from "@/plugins/elementPlus";
+// 响应式本地存储
+import { injectResponsiveStorage } from "@/utils/responsive";
 
 // 引入重置样式
 import "./style/reset.scss";
@@ -17,11 +21,7 @@ import "./assets/iconfont/iconfont.css";
 
 
 const app = createApp(App);
-// // 自定义指令
-// import * as directives from "@/directives";
-// Object.keys(directives).forEach(key => {
-//   app.directive(key, (directives as { [key: string]: Directive })[key]);
-// });
+
 // 全局注册vue-tippy
 import "tippy.js/dist/tippy.css";
 import "tippy.js/themes/light.css";
@@ -30,6 +30,9 @@ app.use(VueTippy);
 
 
 getPlatformConfig(app).then(async config => {
+  app.use(router);
+  app.use(pinia)
+  injectResponsiveStorage(app, config);
   app
     .use(useElementPlus)
     .use(useVxeTable)
