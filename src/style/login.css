@@ -39,68 +39,106 @@
 .login-bg img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit:fill
 }
 
-/* 右侧登录容器 - 透明背景 */
-.login-container {
+
+.login-box {
   position: absolute;
   right: 0;
   top: 0;
-  width: 600px;
+  width: 500px;
   height: 100%;
+  background: rgba(255, 255, 255, 0.539);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(246, 247, 249, 0.727);
-  padding: 40px;
-  transition: background-color 0.3s;
-}
-
-.login-box {
-  width: 100%;
-  max-width: 400px;
-  /* background: rgba(255, 255, 255, 0.95); */
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s;
+  flex-direction: column;
+  padding: 4% 70px;
 }
 
 /* 标题 */
 .login-title {
-  font-size: 24px;
-  font-weight: 500;
-  color: #333;
+  margin-top: 80px;
+  font-size: 26px;
+  font-weight: bold;
+  color: #090909;
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 60px;
   letter-spacing: 2px;
   transition: color 0.3s;
 }
 
 /* 表单 */
 .login-form .el-form-item {
-  margin-bottom: 24px;
+  margin-bottom: 50px;
 }
 
-.login-form .el-input__wrapper {
-  background-color: #fff;
+/* 验证码容器 */
+.verify-code-container {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.verify-code-input {
+  flex: 1;
+}
+
+.verify-code-btn {
+  flex-shrink: 0;
+  min-width: 130px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  background: #4161d3;
+  /* background: linear-gradient(135deg, #667eea 0%, #8bbaf1 100%); */
+  border: none;
+  color: #fff;
   transition: all 0.3s;
 }
 
-.login-form .el-checkbox__label {
-  color: #666;
-  font-size: 14px;
-  transition: color 0.3s;
+.verify-code-btn:hover:not(:disabled) {
+  background: #4161d3;
+  /* background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
+.verify-code-btn:disabled {
+  background: #d0d0d0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+:deep(.el-checkbox__inner) {
+  width: 20px;
+  height: 20px;
+}
+:deep(.el-checkbox__label ){
+  color: #090909;
+  font-size: 20px;
+  transition: color 0.3s;
+}
+.el-input {
+  height: 48px;
+  font-size: 20px;
+}
 /* 登录按钮 */
+.login-btn-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+}
+
 .login-btn {
-  width: 100%;
-  font-size: 16px;
-  font-weight: 500;
+  flex: 1;
+  margin-top: 30px;
+  height: 50px;
+  font-size: 22px;
+  font-weight: bold;
   letter-spacing: 2px;
+  background-color: #4161d3;
+  color: #fff;
 }
 
 /* 底部链接 */
@@ -115,19 +153,14 @@
 }
 
 .footer-links .link {
-  color: #666;
-  font-size: 14px;
+  color: #090909;
+  font-size: 18px;
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .footer-links .link:hover {
   color: #409eff;
-}
-
-.footer-links .required {
-  color: #f56c6c;
-  margin-left: 2px;
 }
 
 /* 暗黑模式适配 */
@@ -143,13 +176,29 @@ html.dark .login-title {
   color: #fff;
 }
 
-html.dark .login-form .el-input__wrapper {
-  background-color: #3a3a3a;
-  box-shadow: 0 0 0 1px #4a4a4a inset;
+/* 所有表单的输入框 - 登录、注册、忘记密码 */
+html.dark .el-input__wrapper {
+  background-color: #3a3a3a !important;
+  box-shadow: 0 0 0 1px #4a4a4a inset !important;
 }
 
-html.dark .login-form .el-checkbox__label {
-  color: #ccc;
+html.dark .el-input__inner {
+  color: #fff !important;
+}
+
+/* checkbox 暗黑模式 */
+html.dark .el-checkbox__label {
+  color: #ccc !important;
+}
+
+html.dark .el-checkbox__inner {
+  background-color: #3a3a3a !important;
+  border-color: #4a4a4a !important;
+}
+
+/* 按钮链接暗黑模式 */
+html.dark .el-button--text {
+  color: #409eff !important;
 }
 
 html.dark .footer-links .link {
@@ -157,6 +206,12 @@ html.dark .footer-links .link {
 }
 
 html.dark .footer-links .link:hover {
+  color: #409eff;
+}
+
+/* 下拉菜单暗黑模式 */
+html.dark .header-tools .is-active {
+  background-color: #3a3a3a;
   color: #409eff;
 }
 

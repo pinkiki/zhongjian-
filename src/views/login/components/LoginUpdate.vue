@@ -1,66 +1,69 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
-import { ref, reactive } from "vue";
-import Motion from "../utils/motion";
-import { message } from "@/utils/message";
-import { updateRules } from "../utils/rule";
-import type { FormInstance } from "element-plus";
-import { useVerifyCode } from "../utils/verifyCode";
-import { $t, transformI18n } from "@/plugins/i18n";
-import { useUserStoreHook } from "@/store/modules/user";
-import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-import Lock from "~icons/ri/lock-fill";
-import Iphone from "~icons/ep/iphone";
-import Keyhole from "~icons/ri/shield-keyhole-line";
+import { ref, reactive, computed } from 'vue'
+import { i18n } from '@/plugins/i18n'
+import Motion from '../utils/motion'
+import { message } from '@/utils/message'
+import { updateRules } from '../utils/rule'
+import type { FormInstance } from 'element-plus'
+import { useVerifyCode } from '../utils/verifyCode'
+import { useUserStoreHook } from '@/store/modules/user'
+import { useRenderIcon } from '@/components/ReIcon/src/hooks'
+import Lock from '~icons/ri/lock-fill'
+import Iphone from '~icons/ep/iphone'
+import Keyhole from '~icons/ri/shield-keyhole-line'
 
-const { t } = useI18n();
-const loading = ref(false);
+const t = (key: string) => (i18n.global.t as any)(key)
+const loading = ref(false)
 const ruleForm = reactive({
-  phone: "",
-  verifyCode: "",
-  password: "",
-  repeatPassword: ""
-});
-const ruleFormRef = ref<FormInstance>();
-const { isDisabled, text } = useVerifyCode();
-const repeatPasswordRule = [
+  phone: '',
+  verifyCode: '',
+  password: '',
+  repeatPassword: '',
+})
+const ruleFormRef = ref<FormInstance>()
+const { isDisabled, text } = useVerifyCode()
+const repeatPasswordRule = computed(() => [
   {
     validator: (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error(transformI18n($t("login.purePassWordSureReg"))));
+      if (value === '') {
+        callback(new Error(t('login.purePassWordSureReg')))
       } else if (ruleForm.password !== value) {
-        callback(
-          new Error(transformI18n($t("login.purePassWordDifferentReg")))
-        );
+        callback(new Error(t('login.purePassWordDifferentReg')))
       } else {
-        callback();
+        callback()
       }
     },
-    trigger: "blur"
-  }
-];
+    trigger: 'blur',
+  },
+])
+
+const emit = defineEmits<{
+  back: []
+}>()
 
 const onUpdate = async (formEl: FormInstance | undefined) => {
-  loading.value = true;
-  if (!formEl) return;
-  await formEl.validate(valid => {
+  loading.value = true
+  if (!formEl) return
+  await formEl.validate((valid) => {
     if (valid) {
       // 模拟请求，需根据实际开发进行修改
       setTimeout(() => {
-        message(transformI18n($t("login.purePassWordUpdateReg")), {
-          type: "success"
-        });
-        loading.value = false;
-      }, 2000);
+        message(t('login.purePassWordUpdateReg'), { type: 'success' })
+        loading.value = false
+        // 重置密码成功后返回登录页
+        useUserStoreHook().SET_CURRENTPAGE(0)
+        emit('back')
+      }, 2000)
     } else {
-      loading.value = false;
+      loading.value = false
     }
-  });
-};
+  })
+}
 
 function onBack() {
-  useVerifyCode().end();
-  useUserStoreHook().SET_CURRENTPAGE(0);
+  useVerifyCode().end()
+  useUserStoreHook().SET_CURRENTPAGE(0)
+  emit('back')
 }
 </script>
 
@@ -69,7 +72,7 @@ function onBack() {
     ref="ruleFormRef"
     :model="ruleForm"
     :rules="updateRules"
-    size="large"
+    class="login-form"
   >
     <Motion>
       <el-form-item prop="phone">
@@ -84,22 +87,23 @@ function onBack() {
 
     <Motion :delay="100">
       <el-form-item prop="verifyCode">
-        <div class="w-full flex justify-between">
+        <div class="verify-code-container">
           <el-input
             v-model="ruleForm.verifyCode"
             clearable
             :placeholder="t('login.pureSmsVerifyCode')"
             :prefix-icon="useRenderIcon(Keyhole)"
+            class="verify-code-input"
           />
           <el-button
             :disabled="isDisabled"
-            class="ml-2!"
+            class="verify-code-btn"
             @click="useVerifyCode().start(ruleFormRef, 'phone')"
           >
             {{
               text.length > 0
-                ? text + t("login.pureInfo")
-                : t("login.pureGetVerifyCode")
+                ? text + t('login.pureInfo')
+                : t('login.pureGetVerifyCode')
             }}
           </el-button>
         </div>
@@ -130,26 +134,24 @@ function onBack() {
       </el-form-item>
     </Motion>
 
-    <Motion :delay="250">
-      <el-form-item>
+    <el-form>
+      <div class="login-btn-group">
         <el-button
-          class="w-full"
-          size="default"
+          class="login-btn"
           type="primary"
           :loading="loading"
           @click="onUpdate(ruleFormRef)"
         >
-          {{ t("login.pureDefinite") }}
+          {{ t('login.pureDefinite') }}
         </el-button>
-      </el-form-item>
-    </Motion>
 
-    <Motion :delay="300">
-      <el-form-item>
-        <el-button class="w-full" size="default" @click="onBack">
-          {{ t("login.pureBack") }}
+        <el-button class="login-btn" @click="onBack">
+          {{ t('login.pureBack') }}
         </el-button>
-      </el-form-item>
-    </Motion>
+      </div>
+    </el-form>
   </el-form>
 </template>
+<style scoped>
+@import url('@/style/login.css');
+</style>

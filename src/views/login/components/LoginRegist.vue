@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
-import { ref, reactive } from "vue";
+import { ref, reactive, computed } from "vue";
+import { i18n } from "@/plugins/i18n";
 import Motion from "../utils/motion";
 import { message } from "@/utils/message";
 import { updateRules } from "../utils/rule";
 import type { FormInstance } from "element-plus";
 import { useVerifyCode } from "../utils/verifyCode";
-import { $t, transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Lock from "~icons/ri/lock-fill";
@@ -14,7 +13,7 @@ import Iphone from "~icons/ep/iphone";
 import User from "~icons/ri/user-3-fill";
 import Keyhole from "~icons/ri/shield-keyhole-line";
 
-const { t } = useI18n();
+const t = (key: string) => (i18n.global.t as any)(key);
 const checked = ref(false);
 const loading = ref(false);
 const ruleForm = reactive({
@@ -26,22 +25,24 @@ const ruleForm = reactive({
 });
 const ruleFormRef = ref<FormInstance>();
 const { isDisabled, text } = useVerifyCode();
-const repeatPasswordRule = [
+const repeatPasswordRule = computed(() => [
   {
     validator: (rule, value, callback) => {
       if (value === "") {
-        callback(new Error(transformI18n($t("login.purePassWordSureReg"))));
+        callback(new Error(t("login.purePassWordSureReg")));
       } else if (ruleForm.password !== value) {
-        callback(
-          new Error(transformI18n($t("login.purePassWordDifferentReg")))
-        );
+        callback(new Error(t("login.purePassWordDifferentReg")));
       } else {
         callback();
       }
     },
     trigger: "blur"
   }
-];
+]);
+
+const emit = defineEmits<{
+  back: []
+}>();
 
 const onUpdate = async (formEl: FormInstance | undefined) => {
   loading.value = true;
@@ -51,16 +52,15 @@ const onUpdate = async (formEl: FormInstance | undefined) => {
       if (checked.value) {
         // 模拟请求，需根据实际开发进行修改
         setTimeout(() => {
-          message(transformI18n($t("login.pureRegisterSuccess")), {
-            type: "success"
-          });
+          message(t("login.pureRegisterSuccess"), { type: "success" });
           loading.value = false;
+          // 注册成功后返回登录页
+          useUserStoreHook().SET_CURRENTPAGE(0);
+          emit('back');
         }, 2000);
       } else {
         loading.value = false;
-        message(transformI18n($t("login.pureTickPrivacy")), {
-          type: "warning"
-        });
+        message(t("login.pureTickPrivacy"), { type: "warning" });
       }
     } else {
       loading.value = false;
@@ -71,6 +71,7 @@ const onUpdate = async (formEl: FormInstance | undefined) => {
 function onBack() {
   useVerifyCode().end();
   useUserStoreHook().SET_CURRENTPAGE(0);
+  emit('back');
 }
 </script>
 
@@ -79,14 +80,14 @@ function onBack() {
     ref="ruleFormRef"
     :model="ruleForm"
     :rules="updateRules"
-    size="large"
+    class="login-form"
   >
     <Motion>
       <el-form-item
         :rules="[
           {
             required: true,
-            message: transformI18n($t('login.pureUsernameReg')),
+            message: t('login.pureUsernameReg'),
             trigger: 'blur'
           }
         ]"
@@ -114,16 +115,17 @@ function onBack() {
 
     <Motion :delay="150">
       <el-form-item prop="verifyCode">
-        <div class="w-full flex justify-between">
+        <div class="verify-code-container">
           <el-input
             v-model="ruleForm.verifyCode"
             clearable
             :placeholder="t('login.pureSmsVerifyCode')"
             :prefix-icon="useRenderIcon(Keyhole)"
+            class="verify-code-input"
           />
           <el-button
             :disabled="isDisabled"
-            class="ml-2!"
+            class="verify-code-btn"
             @click="useVerifyCode().start(ruleFormRef, 'phone')"
           >
             {{
@@ -171,26 +173,25 @@ function onBack() {
       </el-form-item>
     </Motion>
 
-    <Motion :delay="350">
-      <el-form-item>
+    <el-form>
+      <div class="login-btn-group">
         <el-button
-          class="w-full"
-          size="default"
+          class="login-btn"
           type="primary"
           :loading="loading"
           @click="onUpdate(ruleFormRef)"
         >
-          {{ t("login.pureDefinite") }}
+          {{ t('login.pureDefinite') }}
         </el-button>
-      </el-form-item>
-    </Motion>
 
-    <Motion :delay="400">
-      <el-form-item>
-        <el-button class="w-full" size="default" @click="onBack">
-          {{ t("login.pureBack") }}
+        <el-button class="login-btn" @click="onBack">
+          {{ t('login.pureBack') }}
         </el-button>
-      </el-form-item>
-    </Motion>
+      </div>
+    </el-form>
   </el-form>
 </template>
+<style scoped>
+@import url('@/style/login.css');
+
+</style>
