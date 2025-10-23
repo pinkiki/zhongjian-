@@ -120,6 +120,11 @@ function getParentPaths(value: string, routes: RouteRecordRaw[], key = "path") {
 
 /** 查找对应 `path` 的路由信息 */
 function findRouteByPath(path: string, routes: RouteRecordRaw[]) {
+  // 添加空值检查
+  if (!routes || !Array.isArray(routes) || routes.length === 0) {
+    return null;
+  }
+
   let res = routes.find((item: { path: string }) => item.path == path);
   if (res) {
     return isProxy(res) ? toRaw(res) : res;
@@ -155,9 +160,12 @@ function addPathMatch() {
 }
 
 /** 处理动态路由（后端返回的路由） */
-function handleAsyncRoutes(routeList) {
+async function handleAsyncRoutes(routeList) {
   if (routeList.length === 0) {
-    usePermissionStoreHook().handleWholeMenus(routeList);
+    // 当后端返回空路由时，使用前端静态路由
+    const { constantMenus } = await import("./index");
+    // 直接使用 setWholeMenus，避免重复添加 constantMenus
+    usePermissionStoreHook().setWholeMenus(constantMenus);
   } else {
     formatFlatteningRoutes(addAsyncRoutes(routeList)).map(
       (v: RouteRecordRaw) => {
@@ -203,25 +211,23 @@ function initRouter() {
     const key = "async-routes";
     const asyncRouteList = storageLocal().getItem(key) as any;
     if (asyncRouteList && asyncRouteList?.length > 0) {
-      return new Promise(resolve => {
-        handleAsyncRoutes(asyncRouteList);
+      return new Promise(async resolve => {
+        await handleAsyncRoutes(asyncRouteList);
         resolve(router);
       });
     } else {
-      return new Promise(resolve => {
-        getAsyncRoutes().then(({ data }) => {
-          handleAsyncRoutes(cloneDeep(data));
-          storageLocal().setItem(key, data);
-          resolve(router);
-        });
+      return new Promise(async resolve => {
+        const { data } = await getAsyncRoutes();
+        await handleAsyncRoutes(cloneDeep(data));
+        storageLocal().setItem(key, data);
+        resolve(router);
       });
     }
   } else {
-    return new Promise(resolve => {
-      getAsyncRoutes().then(({ data }) => {
-        handleAsyncRoutes(cloneDeep(data));
-        resolve(router);
-      });
+    return new Promise(async resolve => {
+      const { data } = await getAsyncRoutes();
+      await handleAsyncRoutes(cloneDeep(data));
+      resolve(router);
     });
   }
 }
@@ -389,10 +395,16 @@ function handleTopMenu(route) {
 
 /** 获取所有菜单中的第一个菜单（顶级菜单）*/
 function getTopMenu(tag = false): menuType {
-  const topMenu = handleTopMenu(
-    usePermissionStoreHook().wholeMenus[0]?.children[0]
-  );
-  tag && useMultiTagsStoreHook().handleTags("push", topMenu);
+  const wholeMenus = usePermissionStoreHook().wholeMenus;
+
+  // 确保 wholeMenus 有数据并且结构正确
+  if (!wholeMenus?.[0]?.children?.[0]) {
+    console.warn('菜单数据未准备好');
+    return { value: null };
+  }
+
+  const topMenu = handleTopMenu(wholeMenus[0].children[0]);
+  tag && topMenu && useMultiTagsStoreHook().handleTags("push", topMenu);
   return topMenu;
 }
 

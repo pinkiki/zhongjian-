@@ -139,7 +139,7 @@ import { storageLocal } from '@pureadmin/utils'
 import { responsiveStorageNameSpace } from '@/config'
 import type { FormInstance } from 'element-plus'
 import { useUserStoreHook } from '@/store/modules/user'
-import { initRouter, getTopMenu } from '@/router/utils'
+import { initRouter } from '@/router/utils'
 import { bg } from './utils/static'
 import { useRenderIcon } from '@/components/ReIcon/src/hooks'
 import Lock from '~icons/ri/lock-fill'
@@ -279,8 +279,9 @@ const onLogin = async (formEl: FormInstance | undefined) => {
             // 获取后端路由
             return initRouter().then(() => {
               disabled.value = true
+              // 直接跳转到首页，而不是使用 getTopMenu
               router
-                .push(getTopMenu(true).path)
+                .push('/welcome')
                 .then(() => {
                   message(t('login.pureLoginSuccess'), { type: 'success' })
                 })

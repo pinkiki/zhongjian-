@@ -38,12 +38,15 @@ export const useUserStore = defineStore('pure-user', () => {
   }
 
   function logOut() {
-    username.value = ''
-    roles.value = []
-    avatar.value = ''
-    nickname.value = ''
-    permissions.value = []
-    removeToken()
+    return new Promise<void>((resolve) => {
+      username.value = ''
+      roles.value = []
+      avatar.value = ''
+      nickname.value = ''
+      permissions.value = []
+      removeToken()
+      resolve()
+    })
   }
 
   function handRefreshToken(data: any) {

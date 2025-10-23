@@ -3,7 +3,7 @@
     <el-card class="welcome-card">
       <template #header>
         <div class="card-header">
-          <span>欢迎使用中间件管理系统</span>
+          <span>欢迎使用中建八局</span>
         </div>
       </template>
 

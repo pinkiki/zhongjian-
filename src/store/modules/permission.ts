@@ -36,6 +36,8 @@ export const usePermissionStore = defineStore('pure-permission', () => {
 
   function setWholeMenus(routes: RouteComponent[]) {
     wholeMenus.value = routes
+    menusTree.value = cloneDeep(routes)
+    flatteningRoutes.value = flattenRoutes(routes)
   }
 
   function clearAllCachePage() {

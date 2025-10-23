@@ -188,6 +188,10 @@ menus:
   pureMindMap: Mind Map
   pureMenuOverflow: Menu Overflow Show Tooltip Text
   pureChildMenuOverflow: Child Menu Overflow Show Tooltip Text
+  pureDataOverview: Data Overview
+  pureConsistencyCheck: Consistency Check
+  pureHistoryModel: History Model
+  pureIcons: Icon Selector
 status:
   pureLoad: Loading...
   pureMessage: Message
