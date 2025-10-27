@@ -144,22 +144,20 @@ const isFullscreen = ref(false)
 const username = computed(() => userStore.username || '小塔')
 
 // 当前语言
-const currentLocale = computed(() => {
-  const localeData = storageLocal().getItem<StorageConfigs>(
-    `${nameSpace}locale`
-  )
-  return localeData?.locale ?? 'zh'
-})
+const currentLocale = ref(
+  storageLocal().getItem<StorageConfigs>(`${nameSpace}locale`)?.locale ?? 'zh'
+)
 
 // 暗黑模式
-const isDark = computed(() => {
-  const layoutData = storageLocal().getItem(`${nameSpace}layout`) as any
-  return layoutData?.darkMode ?? false
-})
+const isDark = ref(
+  (storageLocal().getItem(`${nameSpace}layout`) as any)?.darkMode ?? false
+)
 
 // 面包屑
 const breadcrumbs = computed(() => {
   const matched = route.matched.filter((item) => {
+    // 过滤掉根路由（避免所有页面都显示"首页"）
+    if (item.path === '/') return false
     // 过滤掉没有title的路由
     if (!item.meta?.title) return false
     // 过滤掉 showLink 为 false 的路由
@@ -192,23 +190,20 @@ const toggleFullscreen = () => {
 const toggleTheme = () => {
   const key = `${nameSpace}layout`
   const layoutData = (storageLocal().getItem(key) as any) || {}
-  layoutData.darkMode = !layoutData.darkMode
+  layoutData.darkMode = !isDark.value
   layoutData.theme = layoutData.darkMode ? 'dark' : 'light'
   storageLocal().setItem(key, layoutData)
 
-  // 应用主题
-  if (layoutData.darkMode) {
-    document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
-  }
+  isDark.value = layoutData.darkMode // ✅ 更新响应式状态
+
+  document.documentElement.classList.toggle('dark', layoutData.darkMode)
 }
+
 
 // 切换语言
 const handleLangChange = (lang: string) => {
-  const localeData = storageLocal().getItem<StorageConfigs>(
-    `${nameSpace}locale`
-  ) || { locale: 'zh' }
+  const localeData =
+    storageLocal().getItem<StorageConfigs>(`${nameSpace}locale`) || { locale: 'zh' }
   localeData.locale = lang
   storageLocal().setItem(`${nameSpace}locale`, localeData)
 
@@ -218,6 +213,8 @@ const handleLangChange = (lang: string) => {
   } else {
     i18n.global.locale = lang as any
   }
+
+  currentLocale.value = lang // ✅ 更新响应式状态
 
   message(t('login.pureSwitchLangSuccess'), { type: 'success' })
 }
@@ -346,4 +343,5 @@ const handleCommand = (command: string) => {
   color: var(--el-color-primary);
   font-weight: 600;
 }
+
 </style>

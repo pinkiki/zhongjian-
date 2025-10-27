@@ -25,7 +25,8 @@
       "Bash(pnpm run lint:style:check)",
       "Bash(pnpm run lint:style)",
       "Bash(timeout 15 pnpm dev)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []
