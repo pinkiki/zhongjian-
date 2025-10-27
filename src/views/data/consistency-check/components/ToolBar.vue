@@ -1,18 +1,5 @@
 <template>
   <div class="toolbar">
-    <!-- 左侧：视图切换 -->
-    <div class="toolbar-left">
-      <!-- <div class="view-tabs">
-        <div class="view-tab" :class="{ active: activeView === 'plan' }" @click="activeView = 'plan'">
-          <el-icon><Grid /></el-icon>
-          <span>平面图</span>
-        </div>
-        <div class="view-tab" :class="{ active: activeView === '3d' }" @click="activeView = '3d'">
-          <el-icon><Box /></el-icon>
-          <span>3D户型图</span>
-        </div>
-      </div> -->
-    </div>
 
     <!-- 中间：当前位置 -->
     <div class="toolbar-center">
@@ -150,14 +137,6 @@
         class="date-picker"
         @change="handleDateChange"
       />
-
-      <div class="divider"></div>
-
-      <!-- 返回按钮 -->
-      <el-button type="primary" size="default" @click="handleBack">
-        <el-icon><Back /></el-icon>
-        返回项目清单
-      </el-button>
     </div>
   </div>
 </template>
@@ -294,61 +273,22 @@ const showAnnotationList = () => {
   console.log('显示批注列表')
 }
 
-// 返回
-const handleBack = () => {
-  emit('back')
-}
 </script>
 
 <style lang="scss" scoped>
 .toolbar {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 64px;
   padding: 0 20px;
-  background: #ffffff;
   border-bottom: 1px solid #e4e7ed;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
-  .toolbar-left {
-    display: flex;
-    align-items: center;
-
-    .view-tabs {
-      display: flex;
-      gap: 8px;
-
-      .view-tab {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        border-radius: 6px;
-        background: #f5f7fa;
-        color: #606266;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.3s;
-
-        &:hover {
-          background: #e6e8eb;
-        }
-
-        &.active {
-          background: #409eff;
-          color: #ffffff;
-        }
-
-        .el-icon {
-          font-size: 16px;
-        }
-      }
-    }
-  }
+  overflow: hidden;
 
   .toolbar-center {
-    flex: 1;
+    // flex: 1;
     display: flex;
     justify-content: center;
 
@@ -382,8 +322,8 @@ const handleBack = () => {
       .view-mode-btn {
         display: flex;
         align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
+        // gap: 6px;
+        padding: 8px 15px;
         border-radius: 6px;
         background: #f5f7fa;
         color: #606266;

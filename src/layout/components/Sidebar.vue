@@ -57,7 +57,7 @@ const menuRoutes = computed(() => {
 <style lang="scss" scoped>
 .sidebar-container {
   position: relative;
-  width: 250px;
+  width: 220px;
   height: 100%;
   border-right: 1px solid var(--el-border-color-light);
   transition: width 0.3s;

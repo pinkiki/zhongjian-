@@ -1,12 +1,14 @@
 <template>
   <div class="consistency-check">
     <!-- 工具栏 -->
-    <ToolBar
+    <div class="topView">
+      <ToolBar
       :model-value="toolbarState"
       @update:model-value="handleToolbarUpdate"
       @location-change="handleLocationChange"
       @back="handleBack"
     />
+    </div>
 
     <!-- 四宫格视图 -->
     <div class="main-content">
@@ -87,7 +89,9 @@ const handleBack = () => {
   height: 100vh;
   overflow: hidden;
   background: #f5f7fa;
-
+.topView {
+  width: 100%;
+}
   .main-content {
     flex: 1;
     min-height: 0;

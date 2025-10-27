@@ -107,7 +107,7 @@
         <el-table-column
           prop="modelName"
           label="模型名称"
-          min-width="180"
+          min-width="150"
           show-overflow-tooltip
         />
         <el-table-column
@@ -152,7 +152,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="240" align="center" fixed="right">
+        <el-table-column label="操作" width="280" align="center" fixed="right">
           <template #default="{ row }">
             <el-button
               text
@@ -170,23 +170,28 @@
             >
               下载
             </el-button>
-            <el-button
-              v-if="row.status !== 'active'"
-              text
-              type="warning"
-              :icon="RefreshRight"
-              @click="handleRestore(row)"
-            >
-              恢复
-            </el-button>
-            <el-button
-              text
-              type="danger"
-              :icon="Delete"
-              @click="handleDelete(row)"
-            >
-              删除
-            </el-button>
+            <el-dropdown trigger="click" @command="(command) => handleCommand(command, row)">
+              <el-button text type="info" :icon="MoreFilled">
+                更多
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item
+                    v-if="row.status !== 'active'"
+                    command="restore"
+                    :icon="RefreshRight"
+                  >
+                    恢复版本
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    command="delete"
+                    :icon="Delete"
+                  >
+                    删除
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -216,7 +221,8 @@ import {
   Download,
   Delete,
   View,
-  RefreshRight
+  RefreshRight,
+  MoreFilled
 } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -344,6 +350,15 @@ const handleSelectionChange = (selection: any[]) => {
   selectedRows.value = selection
 }
 
+// 处理下拉菜单命令
+const handleCommand = (command: string, row: any) => {
+  if (command === 'restore') {
+    handleRestore(row)
+  } else if (command === 'delete') {
+    handleDelete(row)
+  }
+}
+
 // 分页处理
 const handleSizeChange = (size: number) => {
   pagination.value.pageSize = size
@@ -427,7 +442,9 @@ onMounted(() => {
 <style lang="scss" scoped>
 .history-model-container {
   padding: 0;
-
+width: 100%;
+  height: 100%;
+  overflow-y: auto;
   .page-header {
     margin-bottom: 20px;
     border-radius: 8px;
