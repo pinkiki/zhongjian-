@@ -6,6 +6,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { LASLoader } from '@loaders.gl/las'
+import { load } from '@loaders.gl/core'
 
 export class ThreeScene {
   public scene: THREE.Scene
@@ -260,3 +262,169 @@ export function createBuildingModel(): THREE.Group {
 
   return group
 }
+
+/**
+ * 从 LAS 文件加载点云数据
+ * @param url LAS 文件路径
+ * @param samplingRate 采样率 (0-1)，例如 0.1 表示只加载 10% 的点
+ * @param onProgress 加载进度回调
+ */
+export async function loadLASPointCloud(
+  url: string,
+  samplingRate = 0.1,
+  onProgress?: (progress: number) => void
+): Promise<{
+  points: THREE.Points
+  pointCount: number
+  totalPoints: number
+  bounds: { min: THREE.Vector3; max: THREE.Vector3 }
+}> {
+  try {
+    // 加载 LAS 文件
+    onProgress?.(0.1)
+    const data = await load(url, LASLoader)
+    onProgress?.(0.3)
+
+    if (!data || !data.attributes || !data.attributes.POSITION) {
+      throw new Error('无效的 LAS 文件格式')
+    }
+
+    // 提取位置数据
+    const allPositions = data.attributes.POSITION.value
+    const totalPoints = allPositions.length / 3
+
+    console.log(`LAS 文件总点数: ${totalPoints.toLocaleString()}`)
+    console.log(`采样率: ${(samplingRate * 100).toFixed(1)}%`)
+
+    // 计算采样后的点数
+    const sampledPointCount = Math.floor(totalPoints * samplingRate)
+    const step = Math.floor(1 / samplingRate)
+
+    console.log(`将加载 ${sampledPointCount.toLocaleString()} 个点`)
+
+    onProgress?.(0.4)
+
+    // 采样位置数据
+    const positions = new Float32Array(sampledPointCount * 3)
+    for (let i = 0, j = 0; i < totalPoints && j < sampledPointCount; i += step, j++) {
+      positions[j * 3] = allPositions[i * 3]
+      positions[j * 3 + 1] = allPositions[i * 3 + 1]
+      positions[j * 3 + 2] = allPositions[i * 3 + 2]
+    }
+
+    onProgress?.(0.6)
+
+    // 提取颜色数据（如果存在）
+    let colors: Float32Array
+    if (data.attributes.COLOR_0) {
+      // LAS 文件中的颜色通常是 0-65535 范围，需要归一化到 0-1
+      const allColors = data.attributes.COLOR_0.value
+      colors = new Float32Array(sampledPointCount * 3)
+
+      for (let i = 0, j = 0; i < totalPoints && j < sampledPointCount; i += step, j++) {
+        colors[j * 3] = allColors[i * 3] / 65535
+        colors[j * 3 + 1] = allColors[i * 3 + 1] / 65535
+        colors[j * 3 + 2] = allColors[i * 3 + 2] / 65535
+      }
+    } else {
+      // 如果没有颜色数据，基于高度生成渐变色
+      colors = new Float32Array(sampledPointCount * 3)
+      let minZ = Infinity
+      let maxZ = -Infinity
+
+      // 找出最小和最大高度
+      for (let i = 0; i < sampledPointCount; i++) {
+        const z = positions[i * 3 + 2]
+        minZ = Math.min(minZ, z)
+        maxZ = Math.max(maxZ, z)
+      }
+
+      onProgress?.(0.7)
+
+      // 基于高度生成颜色
+      for (let i = 0; i < sampledPointCount; i++) {
+        const z = positions[i * 3 + 2]
+        const t = (z - minZ) / (maxZ - minZ)
+
+        // 蓝色 -> 绿色 -> 黄色 -> 红色 渐变
+        if (t < 0.25) {
+          colors[i * 3] = 0
+          colors[i * 3 + 1] = t * 4
+          colors[i * 3 + 2] = 1
+        } else if (t < 0.5) {
+          colors[i * 3] = (t - 0.25) * 4
+          colors[i * 3 + 1] = 1
+          colors[i * 3 + 2] = 1 - (t - 0.25) * 4
+        } else if (t < 0.75) {
+          colors[i * 3] = 1
+          colors[i * 3 + 1] = 1 - (t - 0.5) * 4
+          colors[i * 3 + 2] = 0
+        } else {
+          colors[i * 3] = 1
+          colors[i * 3 + 1] = (1 - t) * 4
+          colors[i * 3 + 2] = 0
+        }
+      }
+    }
+
+    onProgress?.(0.8)
+
+    // 计算边界框
+    const bounds = {
+      min: new THREE.Vector3(Infinity, Infinity, Infinity),
+      max: new THREE.Vector3(-Infinity, -Infinity, -Infinity),
+    }
+
+    for (let i = 0; i < sampledPointCount; i++) {
+      const x = positions[i * 3]
+      const y = positions[i * 3 + 1]
+      const z = positions[i * 3 + 2]
+
+      bounds.min.x = Math.min(bounds.min.x, x)
+      bounds.min.y = Math.min(bounds.min.y, y)
+      bounds.min.z = Math.min(bounds.min.z, z)
+
+      bounds.max.x = Math.max(bounds.max.x, x)
+      bounds.max.y = Math.max(bounds.max.y, y)
+      bounds.max.z = Math.max(bounds.max.z, z)
+    }
+
+    onProgress?.(0.9)
+
+    // 创建几何体
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+
+    // 计算点的大小（基于点云密度）
+    const diagonal = bounds.min.distanceTo(bounds.max)
+    const pointSize = Math.max(0.05, diagonal / sampledPointCount ** 0.5)
+
+    // 创建材质
+    const material = new THREE.PointsMaterial({
+      size: pointSize,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.9,
+      sizeAttenuation: true,
+    })
+
+    // 创建点云对象
+    const points = new THREE.Points(geometry, material)
+
+    const center = new THREE.Vector3(
+      (bounds.min.x + bounds.max.x) / 2,
+      (bounds.min.y + bounds.max.y) / 2,
+      (bounds.min.z + bounds.max.z) / 2
+    )
+    points.position.set(-center.x, -center.y, -center.z)
+
+    onProgress?.(1.0)
+
+    return { points, pointCount: sampledPointCount, totalPoints, bounds }
+  } catch (error) {
+    console.error('加载 LAS 文件失败:', error)
+    throw error
+  }
+}
+

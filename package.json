@@ -21,6 +21,8 @@
     "@amap/amap-jsapi-loader": "^1.0.1",
     "@howdyjs/mouse-menu": "^2.1.7",
     "@infectoone/vue-ganttastic": "^2.3.2",
+    "@loaders.gl/core": "^4.3.4",
+    "@loaders.gl/las": "^4.3.4",
     "@logicflow/core": "^1.2.28",
     "@logicflow/extension": "^1.2.28",
     "@pureadmin/descriptions": "^1.2.1",
