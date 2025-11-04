@@ -76,9 +76,7 @@ watch(
   gap: 12px;
   width: 100%;
   height: 100%;
-  padding: 16px;
   background: #f5f7fa;
-
   // 单视图：全屏显示
   &.single-view {
     grid-template-columns: 1fr;

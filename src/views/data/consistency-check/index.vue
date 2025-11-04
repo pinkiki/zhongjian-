@@ -96,7 +96,6 @@ const handleBack = () => {
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    border: 1px solid #174cb5;
     margin-bottom: 130px;
   }
 }

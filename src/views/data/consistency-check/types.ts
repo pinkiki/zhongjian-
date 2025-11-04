@@ -6,7 +6,7 @@
 export type ViewMode = 'reality' | 'model' | 'pointCloud' | 'heatmap' | 'mixed'
 
 // 工具类型
-export type ToolType = 'annotation' | 'measure' | 'none'
+export type ToolType = 'annotation' | 'measure' | 'roam' | 'list' | 'none'
 
 // 位置信息
 export interface LocationInfo {
