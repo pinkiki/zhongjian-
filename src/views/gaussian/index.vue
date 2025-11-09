@@ -204,37 +204,42 @@
           </transition>
         </el-card>
 
-        <!-- 模型信息卡片 -->
+        <!-- 模型信息卡片（可折叠）-->
         <el-card shadow="hover" class="control-card info-card">
           <template #header>
-            <div class="card-header">
+            <div class="card-header" @click="modelInfoExpanded = !modelInfoExpanded">
               <div class="header-left">
                 <el-icon><DataAnalysis /></el-icon>
                 <span>模型信息</span>
               </div>
+              <el-icon class="expand-icon" :class="{ 'is-expanded': modelInfoExpanded }">
+                <ArrowDown />
+              </el-icon>
             </div>
           </template>
 
-          <div class="info-content">
-            <div class="info-item">
-              <span class="info-label">点数量:</span>
-              <span class="info-value">29,197,426</span>
+          <transition name="slide-down">
+            <div v-show="modelInfoExpanded" class="info-content">
+              <div class="info-item">
+                <span class="info-label">点数量:</span>
+                <span class="info-value">29,197,426</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">数据大小:</span>
+                <span class="info-value">934 MB</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">细节层次:</span>
+                <span class="info-value">6 级</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">加载状态:</span>
+                <el-tag :type="modelLoaded ? 'success' : 'warning'" size="small">
+                  {{ modelLoaded ? '已加载' : '加载中' }}
+                </el-tag>
+              </div>
             </div>
-            <div class="info-item">
-              <span class="info-label">数据大小:</span>
-              <span class="info-value">934 MB</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">细节层次:</span>
-              <span class="info-value">6 级</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">加载状态:</span>
-              <el-tag :type="modelLoaded ? 'success' : 'warning'" size="small">
-                {{ modelLoaded ? '已加载' : '加载中' }}
-              </el-tag>
-            </div>
-          </div>
+          </transition>
         </el-card>
       </div>
     </div>
@@ -256,6 +261,9 @@
         >
           {{ fps >= 50 ? '流畅' : fps >= 30 ? '一般' : '卡顿' }}
         </el-tag>
+        <el-tooltip :content="`实际渲染: ${renderCount}帧/秒`" placement="top">
+          <el-icon style="margin-left: 8px; cursor: help;"><InfoFilled /></el-icon>
+        </el-tooltip>
       </div>
       <div class="info-section">
         <el-icon><View /></el-icon>
@@ -338,7 +346,8 @@ import {
   Timer,
   View,
   QuestionFilled,
-  Close
+  Close,
+  InfoFilled
 } from '@element-plus/icons-vue'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -368,6 +377,7 @@ const showPanel = ref(true)
 const showHelp = ref(false)
 const isFullscreen = ref(false)
 const renderSettingsExpanded = ref(true)
+const modelInfoExpanded = ref(true) // 模型信息折叠状态
 const currentView = ref<'free' | 'back' | 'left' | 'right'>('free')
 
 // 渲染设置
@@ -378,12 +388,13 @@ const useIndexDB = ref(true) // 暂时禁用IndexDB缓存以便调试
 const useLoadingEffect = ref(true)
 const backgroundColor = ref('#1a1a2e')
 const controlSpeed = ref(1.0)
-const renderQuality = ref<'low' | 'medium' | 'high'>('high')
-const performanceMode = ref(false)
+const renderQuality = ref<'low' | 'medium' | 'high'>('medium') // 改为中等质量，避免卡顿
+const performanceMode = ref(true) // 默认启用性能模式
 
 // 性能监控
 const fps = ref(60)
 const cameraPos = ref({ x: '0.0', y: '2.0', z: '0.0' })
+const renderCount = ref(0) // 渲染帧计数器
 
 // 视图名称映射
 const viewNames = {
@@ -400,12 +411,16 @@ let renderer: THREE.WebGLRenderer
 let controls: OrbitControls
 let lccObject: any
 let animationId: number
+let clock: THREE.Clock // 添加Clock用于精确时间控制
 
 // 性能监控
 let lastTime = performance.now()
 let frames = 0
 let fpsUpdateInterval: number
 let tipInterval: number
+
+// 渲染优化 - 简化逻辑
+let resizeTimeout: number | null = null
 
 // 初始相机位置
 // 初始相机位置（机位置）
@@ -422,38 +437,51 @@ const initScene = () => {
   scene = new THREE.Scene()
   scene.background = new THREE.Color(backgroundColor.value)
 
+  // 初始化Clock
+  clock = new THREE.Clock()
+
   // 创建相机
   camera = new THREE.PerspectiveCamera(
     45,
     canvasContainer.value.clientWidth / canvasContainer.value.clientHeight,
-    1,
+    0.1, // 近裁剪面改小，提升近距离渲染
     150000
   )
   camera.position.copy(initialCameraPosition)
 
-  // 创建渲染器 - 关键：添加 preserveDrawingBuffer 以支持截图
-  const pixelRatio = renderQuality.value === 'high' ? window.devicePixelRatio :
-                    renderQuality.value === 'medium' ? Math.min(window.devicePixelRatio, 1.5) : 1
+  // 创建渲染器 - 优化配置
+  // 关键：降低pixelRatio以提升性能
+  const pixelRatio = renderQuality.value === 'high' ? Math.min(window.devicePixelRatio, 1.5) :
+                    renderQuality.value === 'medium' ? 1 : 0.8
 
   renderer = new THREE.WebGLRenderer({
-    antialias: renderQuality.value !== 'low',
+    antialias: renderQuality.value === 'high', // 只有高质量才开启抗锯齿
     powerPreference: performanceMode.value ? 'high-performance' : 'default',
     preserveDrawingBuffer: true, // 重要：允许截图
-    alpha: false
+    alpha: false,
+    stencil: false, // 禁用模板缓冲，提升性能
+    depth: true
   })
   renderer.setSize(canvasContainer.value.clientWidth, canvasContainer.value.clientHeight)
   renderer.setPixelRatio(pixelRatio)
+
+  // 关键优化：设置渲染器的输出编码
+  renderer.outputColorSpace = THREE.SRGBColorSpace
+
   canvasContainer.value.appendChild(renderer.domElement)
 
   // 添加轨道控制器
   controls = new OrbitControls(camera, renderer.domElement)
   controls.target.copy(initialCameraTarget)
   controls.update()
+  // 关键优化：减小阻尼，让动画更快停止
   controls.enableDamping = true
-  controls.dampingFactor = 0.05
-  controls.rotateSpeed = controlSpeed.value
-  controls.panSpeed = controlSpeed.value
+  controls.dampingFactor = 0.15 // 从0.05增加到0.15，让阻尼更快停止
+  controls.rotateSpeed = controlSpeed.value * 0.8 // 降低旋转速度，更精确
+  controls.panSpeed = controlSpeed.value * 0.8
   controls.zoomSpeed = controlSpeed.value
+  controls.minDistance = 0.5 // 设置最小距离
+  controls.maxDistance = 100 // 设置最大距离
 
   // 模型矩阵
   const modelMatrix = new THREE.Matrix4(
@@ -502,6 +530,9 @@ const loadLCCModel = (modelMatrix: THREE.Matrix4) => {
       useLoadingEffect: useLoadingEffect.value,
       modelMatrix: modelMatrix,
       appKey: null,
+      // 性能优化：设置缓存大小
+      maxHostCacheSize: 512, // 主机内存缓存（MB）
+      maxGpuCacheSize: 512   // GPU内存缓存（MB）
     },
     (mesh: any) => {
       console.log('✅ LCC 模型加载成功回调触发')
@@ -551,6 +582,13 @@ const loadLCCModel = (modelMatrix: THREE.Matrix4) => {
 
   console.log('LCC Object created:', lccObject)
 
+  // 🔥 关键优化：参考demo，在加载后设置最大加载点数
+  // 限制加载的点数，避免性能问题
+  if (lccObject && typeof (lccObject as any).maxLoadSplatCount !== 'undefined') {
+    (lccObject as any).maxLoadSplatCount = 1000000
+    console.log('✅ 已设置 maxLoadSplatCount: 1000000')
+  }
+
   // 暴露到 window 对象方便调试
   ;(window as any).lccObject = lccObject
   ;(window as any).LCCRender = LCCRender
@@ -559,35 +597,63 @@ const loadLCCModel = (modelMatrix: THREE.Matrix4) => {
   ;(window as any).renderer = renderer
 }
 
-// ==================== 渲染循环 ====================
+// ==================== 渲染循环（参考demo优化）====================
 const animate = () => {
   animationId = requestAnimationFrame(animate)
 
-  // 更新控制器
-  controls.update()
+  // 获取时间差，用于平滑控制
+  const delta = clock.getDelta()
 
-  // 🔥 重要：LCCRender.update() 必须在每一帧都调用，不管模型是否加载完成
-  // 因为加载过程也需要update来处理
-  LCCRender.update()
+  // 更新控制器（需要在渲染前更新）
+  if (controls) {
+    controls.update()
+  }
 
-  // 渲染场景
+  // 🔥 重要：LCCRender.update() 必须在每一帧都调用
+  // 参考demo实现，每帧都调用以保证流畅性
+  if (LCCRender && LCCRender.update) {
+    LCCRender.update()
+  }
+
+  // 渲染场景 - 简化逻辑，始终渲染以避免延迟
+  // 性能优化已通过降低质量和像素比实现，而不是跳帧
   renderer.render(scene, camera)
+  renderCount.value++
 
-  // 更新相机位置显示
-  updateCameraPosition()
+  // 每30帧更新一次相机位置显示，减少DOM操作
+  if (frames % 30 === 0) {
+    updateCameraPosition()
+  }
 
   // 计算 FPS
   frames++
 }
 
-// ==================== FPS 监控 ====================
+// ==================== FPS 监控（带自适应质量调整） ====================
 const startFPSMonitor = () => {
   fpsUpdateInterval = window.setInterval(() => {
     const now = performance.now()
     const delta = now - lastTime
-    fps.value = Math.round((frames * 1000) / delta)
+    const currentFPS = Math.round((frames * 1000) / delta)
+    fps.value = currentFPS
     frames = 0
     lastTime = now
+
+    // 自适应质量调整：如果FPS持续过低，自动降低质量
+    if (performanceMode.value && modelLoaded.value) {
+      if (currentFPS < 25 && renderQuality.value === 'high') {
+        renderQuality.value = 'medium'
+        handleQualityChange('medium')
+        ElMessage.warning('检测到性能不足，已自动降低渲染质量')
+      } else if (currentFPS < 20 && renderQuality.value === 'medium') {
+        renderQuality.value = 'low'
+        handleQualityChange('low')
+        ElMessage.warning('检测到严重卡顿，已自动切换到低质量模式')
+      }
+    }
+
+    // 重置渲染计数器（注意：现在没有跳帧了）
+    renderCount.value = 0
   }, 1000)
 }
 
@@ -611,13 +677,25 @@ const updateCameraPosition = () => {
   }
 }
 
-// ==================== 窗口大小调整 ====================
+// ==================== 窗口大小调整（带防抖） ====================
 const handleResize = () => {
-  if (!canvasContainer.value) return
+  // 清除之前的定时器
+  if (resizeTimeout) {
+    clearTimeout(resizeTimeout)
+  }
 
-  camera.aspect = canvasContainer.value.clientWidth / canvasContainer.value.clientHeight
-  camera.updateProjectionMatrix()
-  renderer.setSize(canvasContainer.value.clientWidth, canvasContainer.value.clientHeight)
+  // 设置新的定时器，300ms后执行
+  resizeTimeout = window.setTimeout(() => {
+    if (!canvasContainer.value) return
+
+    camera.aspect = canvasContainer.value.clientWidth / canvasContainer.value.clientHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(canvasContainer.value.clientWidth, canvasContainer.value.clientHeight)
+
+    // 触发一次渲染
+    lastInteractionTime = performance.now()
+    isAnimating = true
+  }, 300)
 }
 
 // ==================== 视角控制 ====================
@@ -767,16 +845,21 @@ const handleBackgroundChange = (value: string) => {
 
 // 控制速度调整
 const handleSpeedChange = (value: number) => {
-  controls.rotateSpeed = value
-  controls.panSpeed = value
+  controls.rotateSpeed = value * 0.8 // 降低旋转速度
+  controls.panSpeed = value * 0.8
   controls.zoomSpeed = value
 }
 
 // 渲染质量调整
 const handleQualityChange = (value: string) => {
-  const pixelRatio = value === 'high' ? window.devicePixelRatio :
-                    value === 'medium' ? Math.min(window.devicePixelRatio, 1.5) : 1
+  const pixelRatio = value === 'high' ? Math.min(window.devicePixelRatio, 1.5) :
+                    value === 'medium' ? 1 : 0.8
   renderer.setPixelRatio(pixelRatio)
+
+  // 同时调整抗锯齿
+  // 注意：WebGL无法动态切换抗锯齿，需要重新创建渲染器
+  // 这里只调整像素比
+
   ElMessage.success(`渲染质量已设置为${value === 'high' ? '高' : value === 'medium' ? '中' : '低'}`)
 }
 
@@ -820,6 +903,9 @@ const cleanup = () => {
   }
   if (tipInterval) {
     clearInterval(tipInterval)
+  }
+  if (resizeTimeout) {
+    clearTimeout(resizeTimeout)
   }
 
   // 清理动画
