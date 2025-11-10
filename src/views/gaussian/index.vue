@@ -7,7 +7,7 @@
           <el-tooltip content="重置视角 (R)" placement="bottom">
             <el-button @click="resetCamera" :icon="RefreshLeft" type="primary" />
           </el-tooltip>
-          <el-tooltip content="截图保存 (S)" placement="bottom">
+          <el-tooltip content="截图保存 (P)" placement="bottom">
             <el-button @click="takeScreenshot" :icon="Camera" />
           </el-tooltip>
           <el-tooltip content="全屏模式 (F)" placement="bottom">
@@ -45,7 +45,33 @@
     </transition>
 
     <!-- 3D 画布 -->
-    <div ref="canvasContainer" class="canvas-container"></div>
+    <div ref="canvasContainer" class="canvas-container">
+      <!-- 方向控制器 -->
+      <div class="direction-controls">
+        <el-tooltip content="向前移动 (W)" placement="top">
+          <div class="arrow-btn arrow-up" @click="moveCamera('up')">
+            <el-icon><ArrowUp /></el-icon>
+          </div>
+        </el-tooltip>
+        <div class="arrow-horizontal">
+          <el-tooltip content="向左移动 (A)" placement="left">
+            <div class="arrow-btn arrow-left" @click="moveCamera('left')">
+              <el-icon><ArrowLeft /></el-icon>
+            </div>
+          </el-tooltip>
+          <el-tooltip content="向右移动 (D)" placement="right">
+            <div class="arrow-btn arrow-right" @click="moveCamera('right')">
+              <el-icon><ArrowRight /></el-icon>
+            </div>
+          </el-tooltip>
+        </div>
+        <el-tooltip content="向后移动 (S)" placement="bottom">
+          <div class="arrow-btn arrow-down" @click="moveCamera('down')">
+            <el-icon><ArrowDown /></el-icon>
+          </div>
+        </el-tooltip>
+      </div>
+    </div>
 
     <!-- 加载覆盖层 -->
     <transition name="fade">
@@ -292,11 +318,31 @@
             <span>缩放视角</span>
           </div>
           <div class="help-item">
+            <kbd>W A S D</kbd>
+            <span>移动控制</span>
+          </div>
+          <div class="help-item">
+            <kbd>W</kbd>
+            <span>向前移动</span>
+          </div>
+          <div class="help-item">
+            <kbd>S</kbd>
+            <span>向后移动</span>
+          </div>
+          <div class="help-item">
+            <kbd>A</kbd>
+            <span>向左移动</span>
+          </div>
+          <div class="help-item">
+            <kbd>D</kbd>
+            <span>向右移动</span>
+          </div>
+          <div class="help-item">
             <kbd>R</kbd>
             <span>重置相机</span>
           </div>
           <div class="help-item">
-            <kbd>S</kbd>
+            <kbd>P</kbd>
             <span>截图</span>
           </div>
           <div class="help-item">
@@ -731,6 +777,100 @@ const resetCamera = () => {
   ElMessage.success('相机已重置')
 }
 
+// 移动相机（游戏风格移动）
+const moveCamera = (direction: 'up' | 'down' | 'left' | 'right') => {
+  const moveDistance = 0.8 * controlSpeed.value // 增加移动距离，更像游戏移动
+
+  // 获取相机的方向向量
+  const forward = new THREE.Vector3()
+  const right = new THREE.Vector3()
+
+  // 计算相机的前方和右方向量（忽略Y轴，保持水平移动）
+  camera.getWorldDirection(forward)
+  forward.y = 0 // 忽略Y轴，保持水平移动
+  forward.normalize()
+
+  right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize()
+
+  const offset = new THREE.Vector3()
+
+  switch (direction) {
+    case 'up':
+      // 向前移动（沿着相机朝向）
+      offset.copy(forward).multiplyScalar(moveDistance)
+      break
+    case 'down':
+      // 向后移动（沿着相机朝向的反方向）
+      offset.copy(forward).multiplyScalar(-moveDistance)
+      break
+    case 'left':
+      // 向左平移（沿着相机左方向）
+      offset.copy(right).multiplyScalar(-moveDistance)
+      break
+    case 'right':
+      // 向右平移（沿着相机右方向）
+      offset.copy(right).multiplyScalar(moveDistance)
+      break
+  }
+
+  // 同时移动相机和目标点，保持视角不变
+  camera.position.add(offset)
+  controls.target.add(offset)
+  controls.update()
+
+  // 添加视觉反馈
+  showMoveFeedback(direction)
+}
+
+// 显示移动反馈
+const showMoveFeedback = (direction: string) => {
+  const directionNames = {
+    up: '向前',
+    down: '向后',
+    left: '向左',
+    right: '向右'
+  }
+
+  // 创建移动提示
+  const feedback = document.createElement('div')
+  feedback.className = 'move-feedback'
+  feedback.textContent = directionNames[direction as keyof typeof directionNames]
+  feedback.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(64, 158, 255, 0.9);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 1000;
+    pointer-events: none;
+    animation: fadeInOut 1s ease-out forwards;
+  `
+
+  // 添加动画样式
+  if (!document.querySelector('#move-feedback-style')) {
+    const style = document.createElement('style')
+    style.id = 'move-feedback-style'
+    style.textContent = `
+      @keyframes fadeInOut {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+      }
+    `
+    document.head.appendChild(style)
+  }
+
+  document.body.appendChild(feedback)
+  setTimeout(() => {
+    document.body.removeChild(feedback)
+  }, 1000)
+}
+
 // ==================== 功能函数 ====================
 
 // 截图 - 修复版本
@@ -876,21 +1016,38 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 
   switch (event.key.toLowerCase()) {
+    case 'w':
+      event.preventDefault()
+      moveCamera('up')
+      break
+    case 's':
+      event.preventDefault()
+      moveCamera('down')
+      break
+    case 'a':
+      event.preventDefault()
+      moveCamera('left')
+      break
+    case 'd':
+      event.preventDefault()
+      moveCamera('right')
+      break
     case 'r':
       event.preventDefault()
       resetCamera()
       break
-    case 's':
+    case 'h':
+      event.preventDefault()
+      showHelp.value = !showHelp.value
+      break
+    // 保持原有的截图和全屏功能（用不同的快捷键）
+    case 'p':
       event.preventDefault()
       takeScreenshot()
       break
     case 'f':
       event.preventDefault()
       toggleFullscreen()
-      break
-    case 'h':
-      event.preventDefault()
-      showHelp.value = !showHelp.value
       break
   }
 }
@@ -1071,6 +1228,136 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   background: transparent;
+  position: relative;
+}
+
+// ==================== 方向控制器 ====================
+.direction-controls {
+  position: absolute;
+  bottom: 80px;
+  left: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 9;
+  user-select: none;
+  padding: 12px;
+  background: rgba(10, 10, 10, 0.15);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(10, 10, 10, 0.25);
+    backdrop-filter: blur(12px);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .arrow-horizontal {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .arrow-btn {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px) saturate(150%);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+
+    // 光晕效果
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(64, 158, 255, 0.1), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .el-icon {
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 24px;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    &:hover {
+      background: rgba(64, 158, 255, 0.28);
+      backdrop-filter: blur(16px) saturate(180%);
+      border-color: rgba(64, 158, 255, 0.5);
+      transform: scale(1.1);
+      box-shadow: 0 8px 24px rgba(64, 158, 255, 0.4),
+                  0 0 20px rgba(64, 158, 255, 0.2);
+
+      &::before {
+        opacity: 1;
+      }
+
+      .el-icon {
+        color: rgba(255, 255, 255, 1);
+        transform: scale(1.15);
+        filter: drop-shadow(0 0 8px rgba(64, 158, 255, 0.6));
+      }
+    }
+
+    &:active {
+      transform: scale(0.98);
+      background: rgba(64, 158, 255, 0.4);
+      box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+    }
+
+    // 方向特定的动画效果
+    &.arrow-up:hover .el-icon {
+      animation: bounce-up 0.6s ease-in-out infinite;
+    }
+
+    &.arrow-down:hover .el-icon {
+      animation: bounce-down 0.6s ease-in-out infinite;
+    }
+
+    &.arrow-left:hover .el-icon {
+      animation: bounce-left 0.6s ease-in-out infinite;
+    }
+
+    &.arrow-right:hover .el-icon {
+      animation: bounce-right 0.6s ease-in-out infinite;
+    }
+  }
+}
+
+// 箭头弹跳动画
+@keyframes bounce-up {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes bounce-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+@keyframes bounce-left {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-4px); }
+}
+
+@keyframes bounce-right {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
 }
 
 // ==================== 加载覆盖层 ====================
