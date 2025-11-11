@@ -71,6 +71,7 @@ menus:
   pureRole: Role Manage
   pureSystemMenu: Menu Manage
   pureDept: Dept Manage
+  pureOrgManagement: Organization Management
   pureSysMonitor: System Monitor
   pureOnlineUser: Online User
   pureLoginLog: Login Log
@@ -192,6 +193,59 @@ menus:
   pureConsistencyCheck: Consistency Check
   pureHistoryModel: History Model
   pureIcons: Icon Selector
+common:
+  actions: Actions
+  edit: Edit
+  delete: Delete
+  cancel: Cancel
+  confirm: Confirm
+organization:
+  pageDescription: Manage organization information and hierarchical structure in the system
+  searchPlaceholder: Search organization name
+  all: All
+  active: Active
+  inactive: Inactive
+  pending: Pending
+  create: New Organization
+  edit: Edit Organization
+  deleteTitle: Confirm Delete
+  deleteConfirm: Are you sure to delete organization "{name}"? This operation cannot be undone.
+  deleteSuccess: Delete successful
+  createSuccess: Create successful
+  editSuccess: Edit successful
+  name: Organization Name
+  namePlaceholder: Please enter organization name
+  nameRequired: Please enter organization name
+  nameLength: Organization name length should be between 2 to 50 characters
+  type: Organization Type
+  typePlaceholder: Please select organization type
+  typeRequired: Please select organization type
+  headquarters: Headquarters
+  branch: Branch
+  subsidiary: Subsidiary
+  contactPerson: Contact Person
+  contactPersonPlaceholder: Please enter contact person name
+  contactPersonRequired: Please enter contact person
+  contactPhone: Contact Phone
+  contactPhonePlaceholder: Please enter contact phone
+  contactPhoneRequired: Please enter contact phone
+  contactPhoneInvalid: Please enter correct phone number
+  email: Email
+  emailPlaceholder: Please enter email address
+  emailInvalid: Please enter correct email address
+  address: Address
+  addressPlaceholder: Please enter organization address
+  description: Description
+  descriptionPlaceholder: Please enter organization description
+  status: Status
+  statusPlaceholder: Please select status
+  statusRequired: Please select status
+  createTime: Create Time
+  noData: No Data
+  expand: Expand
+  collapse: Collapse
+  memberCount: '{count} members'
+  projectCount: '{count} projects'
 status:
   pureLoad: Loading...
   pureMessage: Message

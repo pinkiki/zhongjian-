@@ -5,6 +5,7 @@ import { createApp, type Directive } from "vue";
 import { getPlatformConfig } from "./config";
 import { useVxeTable } from "@/plugins/vxeTable";
 import { useElementPlus } from "@/plugins/elementPlus";
+import { useI18n } from "@/plugins/i18n";
 // 响应式本地存储
 import { injectResponsiveStorage } from "@/utils/responsive";
 
@@ -34,6 +35,7 @@ getPlatformConfig(app).then(async config => {
   app.use(pinia)
   injectResponsiveStorage(app, config);
   app
+    .use(useI18n)
     .use(useElementPlus)
     .use(useVxeTable)
   app.mount("#app");

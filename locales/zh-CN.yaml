@@ -71,6 +71,7 @@ menus:
   pureRole: 角色管理
   pureSystemMenu: 菜单管理
   pureDept: 部门管理
+  pureOrgManagement: 组织管理
   pureSysMonitor: 系统监控
   pureOnlineUser: 在线用户
   pureLoginLog: 登录日志
@@ -192,6 +193,59 @@ menus:
   pureConsistencyCheck: 一致性校验
   pureHistoryModel: 历史模型
   pureIcons: 图标选择器
+common:
+  actions: 操作
+  edit: 编辑
+  delete: 删除
+  cancel: 取消
+  confirm: 确认
+organization:
+  pageDescription: 管理系统中的组织信息和层级结构
+  searchPlaceholder: 搜索组织名称,地址...
+  all: 全部
+  active: 运营
+  inactive: 停用
+  pending: 待审核
+  create: 新建组织
+  edit: 编辑组织信息
+  deleteTitle: 确认删除
+  deleteConfirm: 确定要删除组织"{name}"吗？此操作不可恢复。
+  deleteSuccess: 删除成功
+  createSuccess: 创建成功
+  editSuccess: 修改成功
+  name: 组织名称
+  namePlaceholder: 请输入组织名称
+  nameRequired: 请输入组织名称
+  nameLength: 组织名称长度在 2 到 50 个字符
+  type: 组织类型
+  typePlaceholder: 请选择组织类型
+  typeRequired: 请选择组织类型
+  headquarters: 总公司
+  branch: 分公司
+  subsidiary: 子公司
+  contactPerson: 联系人
+  contactPersonPlaceholder: 请输入联系人姓名
+  contactPersonRequired: 请输入联系人
+  contactPhone: 联系电话
+  contactPhonePlaceholder: 请输入联系电话
+  contactPhoneRequired: 请输入联系电话
+  contactPhoneInvalid: 请输入正确的手机号码
+  email: 邮箱
+  emailPlaceholder: 请输入邮箱地址
+  emailInvalid: 请输入正确的邮箱地址
+  address: 地址
+  addressPlaceholder: 请输入组织地址
+  description: 描述
+  descriptionPlaceholder: 请输入组织描述
+  status: 状态
+  statusPlaceholder: 请选择状态
+  statusRequired: 请选择状态
+  createTime: 创建时间
+  noData: 暂无数据
+  expand: 展开
+  collapse: 收起
+  memberCount: '{count} 名成员'
+  projectCount: '{count} 个项目'
 status:
   pureLoad: 加载中...
   pureMessage: 消息
