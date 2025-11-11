@@ -902,6 +902,12 @@ const resetForm = () => {
   overflow-y: auto;
   margin-bottom: 100px;
 
+  // 暗黑模式适配
+  html.dark & {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+
   .page-header {
     text-align: left;
     margin-bottom: 32px;
@@ -912,6 +918,10 @@ const resetForm = () => {
       font-weight: 700;
       color: #1a1a1a;
       letter-spacing: -0.5px;
+
+      html.dark & {
+        color: #ffffff;
+      }
     }
 
     .page-description {
@@ -919,6 +929,10 @@ const resetForm = () => {
       font-size: 16px;
       color: #6b7280;
       font-weight: 400;
+
+      html.dark & {
+        color: #a0a0a0;
+      }
     }
   }
 
@@ -1027,6 +1041,14 @@ const resetForm = () => {
       justify-content: space-between;
       align-items: center;
       display: flex;
+      background-color: #ffffff;
+      transition: all 0.3s ease;
+
+      html.dark & {
+        background-color: #2a2a2a;
+        border-color: #3a3a3a;
+      }
+
       .count {
         display: flex;
         flex-direction: column;
@@ -1034,9 +1056,18 @@ const resetForm = () => {
           font-size: 18px;
           color: #626266;
           margin-bottom: 13px;
+
+          html.dark & {
+            color: #a0a0a0;
+          }
         }
         .num {
           font-size: 28px;
+          color: #1a1a1a;
+
+          html.dark & {
+            color: #ffffff;
+          }
         }
       }
       .icon {
@@ -1045,12 +1076,24 @@ const resetForm = () => {
     }
     .even:nth-child(1) .icon {
       color: #3b82f6;
+
+      html.dark & {
+        color: #60a5fa;
+      }
     }
     .even:nth-child(2) .icon {
       color: #2c9b33;
+
+      html.dark & {
+        color: #4ade80;
+      }
     }
     .even:nth-child(3) .icon {
       color: #832c9b;
+
+      html.dark & {
+        color: #c084fc;
+      }
     }
   }
   .organization-list {
@@ -1064,6 +1107,16 @@ const resetForm = () => {
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
       transition: all 0.3s ease;
       overflow: hidden;
+
+      html.dark & {
+        background: #2a2a2a;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        border: 1px solid #3a3a3a;
+
+        &:hover {
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9);
+        }
+      }
 
       &:hover {
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -1109,6 +1162,10 @@ const resetForm = () => {
                 font-weight: 600;
                 color: #1a1a1a;
                 line-height: 1.3;
+
+                html.dark & {
+                  color: #ffffff;
+                }
               }
 
               .company-badges {
@@ -1123,6 +1180,11 @@ const resetForm = () => {
                   width: 60px;
                   background-color: #000;
                   color: #fff;
+
+                  html.dark & {
+                    background-color: #3a3a3a;
+                    color: #ffffff;
+                  }
                 }
 
                 .status-tag {
@@ -1138,6 +1200,10 @@ const resetForm = () => {
                 font-size: 16px;
                 color: #3f4248;
                 line-height: 1.5;
+
+                html.dark & {
+                  color: #a0a0a0;
+                }
               }
             }
           }
@@ -1174,6 +1240,10 @@ const resetForm = () => {
           padding-top: 16px;
           border-top: 1px solid #f3f4f6;
 
+          html.dark & {
+            border-top-color: #3a3a3a;
+          }
+
           .meta-item {
             display: flex;
             align-items: center;
@@ -1181,9 +1251,17 @@ const resetForm = () => {
             font-size: 16px;
             color: #3f4248;
 
+            html.dark & {
+              color: #a0a0a0;
+            }
+
             .el-icon {
               color: #9ca3af;
               font-size: 16px;
+
+              html.dark & {
+                color: #6b7280;
+              }
             }
 
             span {
@@ -1204,14 +1282,27 @@ const resetForm = () => {
         border-top: 1px solid #e5e7eb;
         padding: 20px 24px;
 
+        html.dark & {
+          background-color: #252525;
+          border-top-color: #3a3a3a;
+        }
+
         .subsidiary-card {
           background-color: #f4f5f7;
-          // background: #ffffff;
           border-radius: 12px;
           padding: 16px;
           margin-bottom: 12px;
           border: 1px solid #e5e7eb;
           transition: all 0.3s ease;
+
+          html.dark & {
+            background-color: #1f1f1f;
+            border-color: #3a3a3a;
+
+            &:hover {
+              border-color: #4a4a4a;
+            }
+          }
 
           &:last-child {
             margin-bottom: 0;
@@ -1221,6 +1312,10 @@ const resetForm = () => {
             border-color: #d1d5db;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             transform: translateX(4px);
+
+            html.dark & {
+              box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+            }
           }
 
           .subsidiary-content {
@@ -1237,6 +1332,10 @@ const resetForm = () => {
                   font-size: 18px;
                   font-weight: 600;
                   color: #3c4149;
+
+                  html.dark & {
+                    color: #ffffff;
+                  }
                 }
                 .type-tag1 {
                   margin-left: 20px;
@@ -1246,6 +1345,11 @@ const resetForm = () => {
                   width: 60px;
                   background-color: #edeff2;
                   color: #1b1b1b;
+
+                  html.dark & {
+                    background-color: #3a3a3a;
+                    color: #ffffff;
+                  }
                 }
               }
 
@@ -1254,6 +1358,10 @@ const resetForm = () => {
                 font-size: 16px;
                 color: #3f4248;
                 line-height: 1.4;
+
+                html.dark & {
+                  color: #a0a0a0;
+                }
               }
 
               .subsidiary-meta {
@@ -1268,9 +1376,17 @@ const resetForm = () => {
                   font-size: 16px;
                   color: #55585e;
 
+                  html.dark & {
+                    color: #6b7280;
+                  }
+
                   .el-icon {
                     color: #55585e;
                     font-size: 14px;
+
+                    html.dark & {
+                      color: #4b5563;
+                    }
                   }
                 }
               }
@@ -1304,23 +1420,46 @@ const resetForm = () => {
     border-radius: 16px;
     overflow: hidden;
 
+    html.dark & {
+      background-color: #2a2a2a;
+      border: 1px solid #3a3a3a;
+    }
+
     .el-dialog__header {
       padding: 24px 24px 10px;
+
+      html.dark & {
+        background-color: #2a2a2a;
+        border-bottom: 1px solid #3a3a3a;
+      }
 
       .el-dialog__title {
         font-size: 22px;
         font-weight: 600;
         color: #1a1a1a;
+
+        html.dark & {
+          color: #ffffff;
+        }
       }
     }
 
     .el-dialog__body {
       padding: 24px;
+
+      html.dark & {
+        background-color: #2a2a2a;
+      }
     }
 
     .el-dialog__footer {
       padding: 16px 24px 24px;
       border-top: 1px solid #e5e7eb;
+
+      html.dark & {
+        background-color: #2a2a2a;
+        border-top-color: #3a3a3a;
+      }
     }
   }
 
@@ -1330,6 +1469,10 @@ const resetForm = () => {
       color: #0f0f0f;
       font-weight: 500;
       font-size: 16px;
+
+      html.dark & {
+        color: #ffffff;
+      }
     }
     .el-select__wrapper {
       font-size: 16px;
@@ -1346,12 +1489,37 @@ const resetForm = () => {
 
       &.is-focus {
         border-color: #3b82f6;
-        // box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      html.dark & {
+        background-color: #1a1a1a;
+        border-color: #3a3a3a;
+
+        &:hover {
+          border-color: #4a4a4a;
+        }
+
+        &.is-focus {
+          border-color: #60a5fa;
+        }
+
+        .el-input__inner {
+          color: #ffffff;
+        }
+
+        .el-textarea__inner {
+          color: #ffffff;
+        }
       }
     }
 
     .el-textarea__inner {
       resize: vertical;
+
+      html.dark & {
+        background-color: #1a1a1a;
+        color: #ffffff;
+      }
     }
   }
 }
