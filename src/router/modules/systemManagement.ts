@@ -22,6 +22,16 @@ export default {
         icon: "ep/office-building",
         showLink: true
       }
+    },
+    {
+      path: "/system/personnel",
+      name: "Personnel",
+      component: () => import("@/views/system/personnel/index.vue"),
+      meta: {
+        title: "人员管理",
+        icon: "ep/user",
+        showLink: true
+      }
     }
   ]
 } as RouteRecordRaw
