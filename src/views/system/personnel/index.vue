@@ -88,7 +88,7 @@
         empty-text="暂无数据"
         style="width: 100%"
       >
-        <el-table-column label="成员" width="300">
+        <el-table-column label="成员" min-width="300">
           <template #default="{ row }">
             <div class="member-cell">
               <el-avatar :src="row.avatar" :size="40" class="member-avatar">
@@ -102,7 +102,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="邮箱" width="400">
+        <el-table-column label="邮箱" min-width="400">
           <template #default="{ row }">
             <div class="email-cell">
               <el-icon class="email-icon"><Message /></el-icon>
@@ -111,7 +111,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="角色" width="250">
+        <el-table-column label="角色"  min-width="250">
           <template #default="{ row }">
             <el-tag
               :type="getRoleTagType(row.role) as any"
@@ -123,7 +123,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="部门" width="180">
+        <el-table-column label="部门" min-width="180">
           <template #default="{ row }">
             <div class="department-cell">{{ row.department }}</div>
           </template>
@@ -427,7 +427,8 @@ onMounted(() => {
 
       .header-actions {
         .el-button {
-          background-color: #1a1a1a;
+          // background-color: #1a1a1a;
+          background-color: #4a9dfb;
           color: #ffffff;
           height: 40px;
           padding: 0 20px;
@@ -717,4 +718,7 @@ onMounted(() => {
     }
   }
 }
+// :deep(.el-pagination.is-background .el-pager li.is-active) {
+//     background-color: #161617;
+// }
 </style>

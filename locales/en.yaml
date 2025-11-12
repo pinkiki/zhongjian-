@@ -271,7 +271,7 @@ login:
   pureAlipayLogin: Alipay Login
   pureQQLogin: QQ Login
   pureWeiBoLogin: Weibo Login
-  purePhone: Phone
+  emailAddress: email address
   pureSmsVerifyCode: SMS VerifyCode
   pureBack: Back
   pureTest: Mock Test

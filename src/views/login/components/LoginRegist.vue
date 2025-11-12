@@ -30,8 +30,8 @@
         <el-input
           v-model="ruleForm.phone"
           clearable
-          :placeholder="t('login.purePhone')"
-          :prefix-icon="useRenderIcon(Iphone)"
+          :placeholder="t('login.emailAddress')"
+          :prefix-icon="useRenderIcon(Email)"
         />
       </el-form-item>
     </Motion>
@@ -125,6 +125,7 @@ import { useVerifyCode } from "../utils/verifyCode";
 import { useUserStoreHook } from "@/store/modules/user";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Lock from "~icons/ri/lock-fill";
+import Email from "~icons/ri/mail-line";
 import Iphone from "~icons/ep/iphone";
 import User from "~icons/ri/user-3-fill";
 import Keyhole from "~icons/ri/shield-keyhole-line";

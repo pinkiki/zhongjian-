@@ -11,6 +11,7 @@ import { useRenderIcon } from '@/components/ReIcon/src/hooks'
 import Lock from '~icons/ri/lock-fill'
 import Iphone from '~icons/ep/iphone'
 import Keyhole from '~icons/ri/shield-keyhole-line'
+import Email from '~icons/ri/mail-line'
 
 const t = (key: string) => (i18n.global.t as any)(key)
 const loading = ref(false)
@@ -79,8 +80,8 @@ function onBack() {
         <el-input
           v-model="ruleForm.phone"
           clearable
-          :placeholder="t('login.purePhone')"
-          :prefix-icon="useRenderIcon(Iphone)"
+          :placeholder="t('login.emailAddress')"
+          :prefix-icon="useRenderIcon(Email)"
         />
       </el-form-item>
     </Motion>

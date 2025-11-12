@@ -271,8 +271,8 @@ login:
   pureAlipayLogin: 支付宝登录
   pureQQLogin: QQ登录
   pureWeiBoLogin: 微博登录
-  purePhone: 手机号码
-  pureSmsVerifyCode: 短信验证码
+  emailAddress: 邮箱地址
+  pureSmsVerifyCode: 邮箱验证码
   pureBack: 返回
   pureTest: 模拟测试
   pureTip: 扫码后点击"确认"，即可完成登录
@@ -285,7 +285,7 @@ login:
   purePrivacyPolicy: 《隐私政策》
   pureGetVerifyCode: 获取验证码
   pureInfo: 秒后重新获取
-  pureUsernameReg: 请输入账号
+  pureUsernameReg: 请输入邮箱地址
   purePassWordReg: 请输入密码
   pureVerifyCodeReg: 请输入验证码
   pureVerifyCodeCorrectReg: 请输入正确的验证码
