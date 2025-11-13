@@ -32,6 +32,16 @@ export default {
         icon: "ep/user",
         showLink: true
       }
+    },
+    {
+      path: "/system/permissions",
+      name: "Permissions",
+      component: () => import("@/views/system/permissions/index.vue"),
+      meta: {
+        title: "权限管理",
+        icon: "ep/key",
+        showLink: true
+      }
     }
   ]
 } as RouteRecordRaw
