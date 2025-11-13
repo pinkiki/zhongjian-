@@ -404,4 +404,36 @@ watch(() => props.modelValue, (newVal) => {
     }
   }
 }
+
+// 暗黑模式
+html.dark {
+  .user-assignment-modal {
+    .modal-content {
+      .user-list .user-item {
+        background: var(--el-bg-color) !important;
+        border-color: var(--el-border-color) !important;
+
+        &:hover {
+          background: var(--el-fill-color-dark) !important;
+        }
+
+        &.selected {
+          background-color: #1e40af !important; // 蓝色背景，选中的用户会显示白色文字
+          border-color: #3b82f6 !important;
+
+          // 确保选中的用户文字是白色的
+          .user-info-left,
+          .user-info-right {
+            .user-name,
+            .user-email,
+            .user-department,
+            .user-position {
+              color: #ffffff !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
 </style>

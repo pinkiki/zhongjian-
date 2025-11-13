@@ -476,11 +476,6 @@ const handleUserAssignmentConfirm = (userIds: string[]) => {
   background-color: var(--el-bg-color);
   height: 100%;
   overflow-y: scroll;
-
-  // 暗黑模式适配
-  [data-theme='dark'] & {
-    background-color: var(--el-bg-color-page);
-  }
 }
 
 .header-section {
@@ -731,5 +726,54 @@ const handleUserAssignmentConfirm = (userIds: string[]) => {
       font-size: 16px;
     }
   }
+
+// 暗黑模式
+html.dark {
+  .permissions-container {
+    .roles-section {
+      .role-card {
+        background: var(--el-bg-color) !important;
+        border-color: var(--el-border-color) !important;
+
+        &:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .role-description {
+          color: var(--el-text-color-regular) !important;
+        }
+
+        .permission-item {
+          background-color: var(--el-fill-color-dark) !important;
+          color: var(--el-text-color-regular) !important;
+        }
+      }
+    }
+
+    .permissions-matrix {
+      background: var(--el-bg-color) !important;
+      border-color: var(--el-border-color) !important;
+
+      .permission-row {
+        background: var(--el-bg-color) !important;
+        border-color: var(--el-border-color) !important;
+
+        &:hover {
+          background: var(--el-fill-color-dark) !important;
+        }
+
+        .permission-title {
+          color: var(--el-text-color-primary) !important;
+        }
+
+        .role-tag {
+          background: var(--el-fill-color-dark) !important;
+          border-color: var(--el-border-color) !important;
+          color: var(--el-text-color-primary) !important;
+        }
+      }
+    }
+  }
+}
 
 </style>

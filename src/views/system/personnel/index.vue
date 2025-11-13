@@ -718,7 +718,141 @@ onMounted(() => {
     }
   }
 }
-// :deep(.el-pagination.is-background .el-pager li.is-active) {
-//     background-color: #161617;
-// }
+
+// 暗黑模式
+html.dark {
+  .personnel-container {
+    background: var(--el-bg-color) !important;
+
+    .page-header {
+      background: var(--el-bg-color) !important;
+      border: 1px solid var(--el-border-color) !important;
+
+      .header-text {
+        .page-title {
+          color: var(--el-text-color-primary) !important;
+        }
+
+        .page-description {
+          color: var(--el-text-color-regular) !important;
+        }
+      }
+    }
+
+    .stats-section {
+      .stat-card {
+        background: var(--el-bg-color) !important;
+        border: 1px solid var(--el-border-color) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+
+        &:hover {
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .stat-content {
+          .stat-number {
+            color: var(--el-text-color-primary) !important;
+          }
+
+          .count-label {
+            color: var(--el-text-color-primary) !important;
+          }
+
+          .stat-label {
+            color: var(--el-text-color-regular) !important;
+          }
+        }
+      }
+    }
+
+    .search-section {
+      background: var(--el-bg-color) !important;
+      border: 1px solid var(--el-border-color) !important;
+
+      .search-input {
+        :deep(.el-input__wrapper) {
+          background: var(--el-fill-color-dark) !important;
+          border-color: var(--el-border-color) !important;
+
+          &:hover {
+            border-color: var(--el-border-color-hover) !important;
+          }
+
+          &.is-focus {
+            border-color: var(--el-color-primary) !important;
+          }
+
+          .el-input__inner {
+            color: var(--el-text-color-primary) !important;
+          }
+        }
+      }
+    }
+
+    .table-container {
+      background: var(--el-bg-color) !important;
+      border-color: var(--el-border-color) !important;
+
+      .personnel-table {
+        .member-cell {
+          .member-info {
+            .member-name {
+              color: var(--el-text-color-primary) !important;
+            }
+
+            .member-id {
+              color: var(--el-text-color-regular) !important;
+            }
+          }
+        }
+
+        .email-cell {
+          color: var(--el-text-color-primary) !important;
+
+          .email-icon {
+            color: var(--el-text-color-regular) !important;
+          }
+        }
+
+        .department-cell {
+          color: var(--el-text-color-primary) !important;
+        }
+
+        .action-cell {
+          .action-btn {
+            &.el-button--text {
+              &:hover {
+                background-color: var(--el-fill-color-dark) !important;
+              }
+            }
+          }
+        }
+
+        :deep(.el-table__row) {
+          background: var(--el-bg-color) !important;
+
+          &:hover {
+            background: var(--el-fill-color-dark) !important;
+          }
+        }
+
+        :deep(.el-table__header) {
+          th {
+            background: var(--el-bg-color) !important;
+            border-color: var(--el-border-color) !important;
+            color: var(--el-text-color-primary) !important;
+          }
+        }
+
+        :deep(.el-table__body) {
+          tr {
+            td {
+              border-color: var(--el-border-color) !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
 </style>
